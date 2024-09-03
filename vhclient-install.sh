@@ -34,12 +34,13 @@ function log {
 
 # Function to continue script execution after a reboot
 function before_reboot {
-    # Add this script to bashrc so it gets triggered immediately after reboot
+    # Add this script to .bashrc so that it runs immediately after the user logs in.
     echo "bash ${script_path}" >> /home/$script_was_started_by/.bashrc
 
     # Create a flag file to check if we are resuming from reboot.
     touch $flag_file_resume_after_reboot
 
+    # Print message to console
     clear
     echo
     echo "Reboot required"
@@ -51,13 +52,66 @@ function before_reboot {
     reboot
 }
 
-# Function to continue script execution after a reboot
+# Function to disable the launch of this script when a user logs in
 function after_reboot {
     # Remove a flag file
     rm $flag_file_resume_after_reboot
 
     # Remove this script from bashrc
-    sed -i "/bash ${script_path}/d" /home/$script_was_started_by/.bashrc
+    sed -i "/bash ${script_path_sed}/d" "$bashrc_file"
+}
+
+function message_before_start {
+    # Print message to console
+    clear
+    echo
+    echo "Script: $script_name"
+    echo
+    echo "Log: $logfile_path"
+    echo
+    echo "Will be installed:"
+    echo
+    echo "${echo_tab} $vhclient_bin"
+    echo
+
+    # Wait until the user presses enter
+    read -p "Press Enter to start: "
+}
+
+function message_at_the_end {
+    # Print message to console
+    clear
+    echo
+    echo "Script: $script_name"
+    echo
+    echo "Log: $logfile_path"
+    echo
+    echo "Installed:"
+    echo
+    echo "${echo_tab}VirtualHere Client $vhclient_installed_version"
+    echo
+    echo "$vhclient_service:"
+    echo
+    systemctl --no-pager status $vhclient_service | grep Active
+    echo
+    echo "IP: $show_ip"
+    echo
+    echo "List available devices:"
+    echo
+    echo "${echo_tab}vhclientx86_64 -t "\""LIST"\"""
+    echo
+    echo "Connect usb device:"
+    echo
+    echo "${echo_tab}vhclientx86_64 -t "\""USE,hostname.number"\"""
+    echo
+    echo "Automatically connect usb device after startup:"
+    echo
+    echo "${echo_tab}vhclientx86_64 -t "\""AUTO USE DEVICE PORT,hostname.number"\"""
+    echo
+    echo "If "\""Auto Search"\"" is disabled or does not work, you can add a server manually:"
+    echo
+    echo "${echo_tab}vhclientx86_64 -t "\""MANUAL HUB ADD,serverip:7575"\"""
+    echo
 }
 
 ### -------- Functions -------- ###
@@ -80,6 +134,9 @@ fi
 # Path to this script
 script_path="${script_dir}/${script_name}"
 
+# Path to this script with escaped slashes (for sed)
+script_path_sed=$(echo "$script_path" | sed 's/\//\\\//g')
+
 # Path to log file
 logfile_path="${script_dir}/${script_name%%.*}.log"
 
@@ -88,10 +145,13 @@ echo_tab='     '
 show_ip=$(hostname -I)
 
 # Set the flag file name and location
-flag_file_resume_after_reboot="/var/run/resume-after-reboot-${script_name%%.*}"
+flag_file_resume_after_reboot="${script_dir}/resume-after-reboot-${script_name%%.*}"
 
 # Get user name
 script_was_started_by=$(logname)
+
+# Path to .bashrc
+bashrc_file="/home/${script_was_started_by}/.bashrc"
 
 # Privilege escalation
 elevate
@@ -101,27 +161,21 @@ exec > >(tee -a "$logfile_path") 2>&1
 
 ### -------- Preparation -------- ###
 
-### -------- Message before start  -------- ###
+### -------- Script start  -------- ###
 
-# Print message to console
-clear
-echo
-echo "Script: $script_name"
-echo
-echo "Log: $logfile_path"
-echo
-echo "Will be installed:"
-echo
-echo "${echo_tab} $vhclient_bin"
-echo
+# Message to log
+log "Script start"
 
-# Wait until the user presses enter
-read -p "Press Enter to start: "
+# Output the start message only if there is no flag file
+if [ ! -f $flag_file_resume_after_reboot ]; then
+    message_before_start
+fi
 
-### -------- Message before start -------- ###
+### -------- Script start -------- ###
 
 ### -------- Checking for kernel modules -------- ###
 
+# Message to log
 log "Checking for kernel modules"
 
 # This section checks if the kernel modules “usbip_core” and “vhci-hcd” are loaded.
@@ -148,15 +202,11 @@ if [[ ! "$kmod_check_vhci_hcd" == "vhci_hcd" ]]; then
     before_reboot
 fi
 
-# Check if the reboot flag file exists
-if [ -f $flag_file_resume_after_reboot ]; then
-    after_reboot
-fi
-
 ### -------- Checking for kernel modules -------- ###
 
 ### -------- Download and install -------- ###
 
+# Message to log
 log "Download and install"
 
 # Download and move to the specified path
@@ -178,37 +228,18 @@ vhclient_installed_version=$(vhclientx86_64 -t "HELP" | grep "VirtualHere Client
 
 ### -------- Download and install -------- ###
 
-### -------- Message at the end -------- ###
+### -------- Scrip end -------- ###
 
-# Print message to console
-clear
-echo
-echo "Installed:"
-echo
-echo "${echo_tab}VirtualHere Client $vhclient_installed_version"
-echo
-echo "$vhclient_service:"
-echo
-systemctl --no-pager status $vhclient_service | grep Active
-echo
-echo "IP: $show_ip"
-echo
-echo "Log: $logfile_path"
-echo
-echo "List available devices:"
-echo
-echo "${echo_tab}vhclientx86_64 -t "\""LIST"\"""
-echo
-echo "Connect usb device:"
-echo
-echo "${echo_tab}vhclientx86_64 -t "\""USE,hostname.number"\"""
-echo
-echo "Automatically connect usb device after startup:"
-echo
-echo "${echo_tab}vhclientx86_64 -t "\""AUTO USE DEVICE PORT,hostname.number"\"""
-echo
-echo "If "\""Auto Search"\"" is disabled or does not work, you can add a server manually:"
-echo
-echo "${echo_tab}vhclientx86_64 -t "\""MANUAL HUB ADD,serverip:7575"\"""
-echo
-### -------- Message at the end -------- ###
+# Message to log
+log "Scrip end"
+
+# Output the start message only if there is no flag file
+if [ -f $flag_file_resume_after_reboot ]; then
+    # Disable script launch after user login
+    after_reboot
+
+    # Print message to console
+    message_at_the_end
+fi
+
+### -------- Scrip end -------- ###
