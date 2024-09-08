@@ -61,6 +61,7 @@ function after_reboot {
     sed -i "/bash ${script_path_sed}/d" "$bashrc_file"
 }
 
+# Function that displays the start message and waits for user confirmation to continue
 function message_before_start {
     # Print message to console
     clear
@@ -78,6 +79,7 @@ function message_before_start {
     read -p "Press Enter to start: "
 }
 
+# Function displaying the final summary of the script execution results
 function message_at_the_end {
     # Print message to console
     clear
