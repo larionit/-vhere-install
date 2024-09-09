@@ -7,7 +7,7 @@
 
 Script for installing VirtualHere.
 
-## Quick start
+## Быстрый запуск
 
 Ubuntu:
 
