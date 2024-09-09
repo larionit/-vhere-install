@@ -43,9 +43,9 @@ function before_reboot {
     # Print message to console
     clear
     echo
-    echo "Reboot required"
+    echo "Требуется перезагрузка"
     echo
-    read -p "Press Enter to reboot: "
+    read -p "Нажмите Enter для перезагрузки: "
     echo
 
     # Reboot
@@ -66,19 +66,17 @@ function message_before_start {
     # Print message to console
     clear
     echo
-    echo "IP: $show_ip"
+    echo "Скрипт: $script_name"
     echo
-    echo "Script: $script_name"
+    echo "Лог: $logfile_path"
     echo
-    echo "Log: $logfile_path"
-    echo
-    echo "Will be installed:"
+    echo "Будут установлены:"
     echo
     echo "${echo_tab} $vhclient_bin"
     echo
 
     # Wait until the user presses enter
-    read -p "Press Enter to start: "
+    read -p "Нажмите Enter, чтобы начать: "
 }
 
 # Function displaying the final summary of the script execution results
@@ -88,11 +86,11 @@ function message_at_the_end {
     echo
     echo "IP: $show_ip"
     echo
-    echo "Script: $script_name"
+    echo "Скрипт: $script_name"
     echo
-    echo "Log: $logfile_path"
+    echo "Лог: $logfile_path"
     echo
-    echo "Installed:"
+    echo "Установлены:"
     echo
     echo "${echo_tab}VirtualHere Client $vhclient_installed_version"
     echo
@@ -100,19 +98,19 @@ function message_at_the_end {
     echo
     systemctl --no-pager status $vhclient_service | grep Active
     echo
-    echo "List available devices:"
+    echo "Список доступных устройств:"
     echo
     echo "${echo_tab}vhclientx86_64 -t "\""LIST"\"""
     echo
-    echo "Connect usb device:"
+    echo "Подключить usb-устройство:"
     echo
     echo "${echo_tab}vhclientx86_64 -t "\""USE,hostname.number"\"""
     echo
-    echo "Automatically connect usb device after startup:"
+    echo "Автоматическое подключение usb-устройста после запуска:"
     echo
     echo "${echo_tab}vhclientx86_64 -t "\""AUTO USE DEVICE PORT,hostname.number"\"""
     echo
-    echo "If "\""Auto Search"\"" is disabled or does not work, you can add a server manually:"
+    echo "Если "\""Auto Search"\"" отключен или не работает, вы можете добавить сервер вручную:"
     echo
     echo "${echo_tab}vhclientx86_64 -t "\""MANUAL HUB ADD,serverip:7575"\"""
     echo
