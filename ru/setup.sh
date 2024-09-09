@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Link to installable script
-target_script_url=https://raw.githubusercontent.com/larionit/vhere-install/dev/ru/vhclient-install.sh
+target_script_url=https://raw.githubusercontent.com/larionit/vhere-install/main/ru/vhclient-install.sh
 
 # Link to this installation script (needed in case of privilege escalation via sudo)
-setup_script_url=https://raw.githubusercontent.com/larionit/vhere-install/dev/ru/setup.sh
+setup_script_url=https://raw.githubusercontent.com/larionit/vhere-install/main/ru/setup.sh
 
 # Temporary file for this installation script (needed in case of sudo privilege escalation)
 temp_setup_script=$(mktemp)
