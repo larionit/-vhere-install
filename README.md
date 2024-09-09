@@ -1,13 +1,11 @@
 [RU] | [EN]
 
-[EN]: https://github.com/larionit/vhere-install/blob/dev/README.md
-[RU]: https://github.com/larionit/vhere-install/blob/dev/ru/README.md
 
 # vhere-install
 
 Script for installing VirtualHere.
 
-## Быстрый запуск
+## Quick start
 
 Ubuntu:
 
